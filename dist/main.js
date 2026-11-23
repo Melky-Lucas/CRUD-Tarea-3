@@ -7,7 +7,15 @@ const products = [
     { id: 5, name: "Audífonos Bluetooth", category: "Tecnología", price: 2300, stock: 25 },
 ];
 const tbody = document.getElementById("product-list");
+const form = document.getElementById("product-form");
+const inputName = document.getElementById("name");
+const inputCategory = document.getElementById("category");
+const inputPrice = document.getElementById("price");
+const inputStock = document.getElementById("stock");
 const currency = new Intl.NumberFormat("es-DO", { style: "currency", currency: "DOP" });
+function nextId() {
+    return Math.max(0, ...products.map((p) => p.id)) + 1;
+}
 function createCell(text) {
     const td = document.createElement("td");
     td.textContent = text;
@@ -21,4 +29,18 @@ function render() {
         tbody.appendChild(tr);
     });
 }
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const name = inputName.value.trim();
+    const category = inputCategory.value.trim();
+    const price = Number(inputPrice.value);
+    const stock = Number(inputStock.value);
+    if (!name || !category || !Number.isFinite(price) || price < 0 || !Number.isInteger(stock) || stock < 0) {
+        alert("Revisa los datos: todos los campos son obligatorios y deben ser válidos.");
+        return;
+    }
+    products.push({ id: nextId(), name, category, price, stock });
+    form.reset();
+    render();
+});
 render();
