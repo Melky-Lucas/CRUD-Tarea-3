@@ -6,13 +6,35 @@ interface Product {
   stock: number;
 }
 
-const products: Product[] = [
+const STORAGE_KEY = "crud-productos";
+
+const DEFAULT_PRODUCTS: Product[] = [
   { id: 1, name: "Laptop Lenovo IdeaPad", category: "Tecnología", price: 38500, stock: 12 },
   { id: 2, name: "Mouse inalámbrico", category: "Tecnología", price: 850, stock: 40 },
   { id: 3, name: "Silla ergonómica", category: "Oficina", price: 7900, stock: 8 },
   { id: 4, name: "Cuaderno profesional", category: "Papelería", price: 120, stock: 150 },
   { id: 5, name: "Audífonos Bluetooth", category: "Tecnología", price: 2300, stock: 25 },
 ];
+
+function loadProducts(): Product[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw) as Product[];
+  } catch {
+    console.warn("No se pudo leer localStorage, se usan datos por defecto.");
+  }
+  return DEFAULT_PRODUCTS.map((p) => ({ ...p }));
+}
+
+function saveProducts(): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  } catch {
+    console.warn("No se pudo guardar en localStorage.");
+  }
+}
+
+const products: Product[] = loadProducts();
 
 let editingId: number | null = null;
 
@@ -75,6 +97,7 @@ function removeProduct(id: number): void {
   const index = products.findIndex((p) => p.id === id);
   if (index === -1) return;
   products.splice(index, 1);
+  saveProducts();
   if (editingId === id) resetForm();
   render();
 }
@@ -149,6 +172,7 @@ form.addEventListener("submit", (event) => {
     const product = products.find((p) => p.id === editingId);
     if (product) Object.assign(product, { name, category, price, stock });
   }
+  saveProducts();
   resetForm();
   render();
 });
