@@ -23,6 +23,8 @@ const inputName = document.getElementById("name") as HTMLInputElement;
 const inputCategory = document.getElementById("category") as HTMLInputElement;
 const inputPrice = document.getElementById("price") as HTMLInputElement;
 const inputStock = document.getElementById("stock") as HTMLInputElement;
+const searchInput = document.getElementById("search") as HTMLInputElement;
+const categoryFilter = document.getElementById("category-filter") as HTMLSelectElement;
 const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
 const cancelBtn = document.getElementById("cancel-btn") as HTMLButtonElement;
 const currency = new Intl.NumberFormat("es-DO", { style: "currency", currency: "DOP" });
@@ -77,9 +79,39 @@ function removeProduct(id: number): void {
   render();
 }
 
+function refreshCategoryOptions(): void {
+  const current = categoryFilter.value;
+  const categories = Array.from(new Set(products.map((p) => p.category))).sort();
+  categoryFilter.innerHTML = "";
+  categoryFilter.appendChild(new Option("Todas las categorías", ""));
+  categories.forEach((c) => categoryFilter.appendChild(new Option(c, c)));
+  categoryFilter.value = categories.includes(current) ? current : "";
+}
+
+function getVisibleProducts(): Product[] {
+  const term = searchInput.value.trim().toLowerCase();
+  const category = categoryFilter.value;
+  return products.filter(
+    (p) => p.name.toLowerCase().includes(term) && (category === "" || p.category === category)
+  );
+}
+
 function render(): void {
+  refreshCategoryOptions();
+  const visible = getVisibleProducts();
   tbody.innerHTML = "";
-  products.forEach((p) => {
+
+  if (visible.length === 0) {
+    const tr = document.createElement("tr");
+    const td = createCell("No hay productos para mostrar.");
+    td.colSpan = 6;
+    td.className = "empty";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+    return;
+  }
+
+  visible.forEach((p) => {
     const tr = document.createElement("tr");
     const actions = document.createElement("td");
     actions.className = "actions";
@@ -122,5 +154,7 @@ form.addEventListener("submit", (event) => {
 });
 
 cancelBtn.addEventListener("click", resetForm);
+searchInput.addEventListener("input", render);
+categoryFilter.addEventListener("change", render);
 
 render();
