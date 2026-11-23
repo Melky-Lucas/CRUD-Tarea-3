@@ -54,13 +54,24 @@ function startEdit(id) {
     cancelBtn.hidden = false;
     form.scrollIntoView({ behavior: "smooth" });
 }
+function removeProduct(id) {
+    if (!confirm("¿Seguro que deseas eliminar este producto?"))
+        return;
+    const index = products.findIndex((p) => p.id === id);
+    if (index === -1)
+        return;
+    products.splice(index, 1);
+    if (editingId === id)
+        resetForm();
+    render();
+}
 function render() {
     tbody.innerHTML = "";
     products.forEach((p) => {
         const tr = document.createElement("tr");
         const actions = document.createElement("td");
         actions.className = "actions";
-        actions.append(createButton("Editar", "edit", () => startEdit(p.id)));
+        actions.append(createButton("Editar", "edit", () => startEdit(p.id)), createButton("Eliminar", "delete", () => removeProduct(p.id)));
         tr.append(createCell(String(p.id)), createCell(p.name), createCell(p.category), createCell(currency.format(p.price)), createCell(String(p.stock)), actions);
         tbody.appendChild(tr);
     });

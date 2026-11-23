@@ -68,6 +68,15 @@ function startEdit(id: number): void {
   form.scrollIntoView({ behavior: "smooth" });
 }
 
+function removeProduct(id: number): void {
+  if (!confirm("¿Seguro que deseas eliminar este producto?")) return;
+  const index = products.findIndex((p) => p.id === id);
+  if (index === -1) return;
+  products.splice(index, 1);
+  if (editingId === id) resetForm();
+  render();
+}
+
 function render(): void {
   tbody.innerHTML = "";
   products.forEach((p) => {
@@ -75,7 +84,8 @@ function render(): void {
     const actions = document.createElement("td");
     actions.className = "actions";
     actions.append(
-      createButton("Editar", "edit", () => startEdit(p.id))
+      createButton("Editar", "edit", () => startEdit(p.id)),
+      createButton("Eliminar", "delete", () => removeProduct(p.id))
     );
     tr.append(
       createCell(String(p.id)),
