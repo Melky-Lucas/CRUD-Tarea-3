@@ -1,0 +1,13 @@
+{
+  "name": "crud-productos-gitflow",
+  "version": "1.0.0",
+  "description": "CRUD de productos con HTML, CSS y TypeScript usando Git Flow",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "license": "MIT"
+}
